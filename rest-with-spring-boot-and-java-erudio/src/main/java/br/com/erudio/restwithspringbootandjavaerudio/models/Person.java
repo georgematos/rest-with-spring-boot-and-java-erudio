@@ -12,11 +12,11 @@ public class Person {
     private String gender;
 
     public Person(Builder builder) {
-        this.setId(builder.id);
-        this.setFirstName(builder.firstName);
-        this.setLastName(builder.lastName);
-        this.address(builder.address);
-        this.gender(builder.gender);
+        this.id = builder.id;
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.address = builder.address;
+        this.gender = builder.gender;
     }
 
     public static class Builder {
