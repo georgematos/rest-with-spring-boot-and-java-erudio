@@ -11,6 +11,9 @@ public class Person {
     private String address;
     private String gender;
 
+    public Person() {
+    }
+
     public Person(Builder builder) {
         this.id = builder.id;
         this.firstName = builder.firstName;

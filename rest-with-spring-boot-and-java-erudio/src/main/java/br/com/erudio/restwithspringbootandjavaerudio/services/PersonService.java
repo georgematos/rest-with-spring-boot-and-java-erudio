@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
+import br.com.erudio.restwithspringbootandjavaerudio.dto.PersonDTO;
 import br.com.erudio.restwithspringbootandjavaerudio.models.Person;
 
 @Service
@@ -15,15 +16,44 @@ public class PersonService {
     private Logger logger = Logger.getLogger(PersonService.class.getName());
     private List<Person> persons = new ArrayList<>();
 
+    public PersonService() {
+        persons.addAll(mockPersons());
+    }
+
     public List<Person> findAll() {
         logger.info("Finding all persons!");
-        persons.addAll(mockPersons());
         return persons;
     }
 
     public Person getById(UUID id) {
         logger.info("Finding one person!");
         return persons.stream().filter((x) -> x.getId().equals(id)).findFirst().get();
+    }
+
+    public PersonDTO createPerson(Person person) {
+        logger.info("Creating one person!");
+        person.setId(UUID.randomUUID());
+        persons.add(person);
+        return new PersonDTO(person.getId(), person.getFirstName());
+    }
+    
+    public PersonDTO updatePerson(Person person) {
+        logger.info("Editing one person!");
+        for (Person p : persons) {
+            if (p.getId().equals(person.getId())) {
+                if (person.getFirstName() != null) p.setFirstName(person.getFirstName());
+                if (person.getLastName() != null) p.setLastName(person.getLastName());
+                if (person.getAddress() != null) p.setAddress(person.getAddress());
+                if (person.getGender() != null) p.setGender(person.getGender());
+                return new PersonDTO(p.getId(), p.getFirstName());
+            }
+        }
+        return null;
+    }
+
+    public void deletePerson(UUID id) {
+        logger.info("Deleting one person!");
+        persons.removeIf(x -> x.getId().equals(id));
     }
 
     private List<Person> mockPersons() {
