@@ -27,7 +27,9 @@ target/
 /bin/
 blog/bin/
 **/.tern-project
-**/.vscode
+
+#VScode files
+.vscode/
 
 #IntelliJ files
 **/*.iml
