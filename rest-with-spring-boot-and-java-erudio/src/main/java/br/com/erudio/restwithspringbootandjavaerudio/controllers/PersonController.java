@@ -31,7 +31,7 @@ public class PersonController {
 
     @GetMapping("/{id}")
     public Person getPersonById(@PathVariable String id) {
-        return personService.getById(UUID.fromString(id));
+        return personService.simplefiedFindById(UUID.fromString(id));
     }
 
     @PostMapping

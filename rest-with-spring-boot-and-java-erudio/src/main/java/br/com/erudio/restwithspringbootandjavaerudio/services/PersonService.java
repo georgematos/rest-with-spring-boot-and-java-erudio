@@ -1,78 +1,64 @@
 package br.com.erudio.restwithspringbootandjavaerudio.services;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.erudio.restwithspringbootandjavaerudio.dto.PersonDTO;
+import br.com.erudio.restwithspringbootandjavaerudio.exceptions.ResourceNotFoundException;
 import br.com.erudio.restwithspringbootandjavaerudio.models.Person;
+import br.com.erudio.restwithspringbootandjavaerudio.repository.PersonRepository;
 
 @Service
 public class PersonService {
     private Logger logger = Logger.getLogger(PersonService.class.getName());
-    private List<Person> persons = new ArrayList<>();
+
+    @Autowired
+    PersonRepository personRepository;
 
     public PersonService() {
-        persons.addAll(mockPersons());
     }
 
     public List<Person> findAll() {
         logger.info("Finding all persons!");
-        return persons;
+        return personRepository.findAll();
     }
 
-    public Person getById(UUID id) {
+    public Person simplefiedFindById(UUID id) {
         logger.info("Finding one person!");
-        return persons.stream().filter((x) -> x.getId().equals(id)).findFirst().get();
+        return findById(id);
     }
 
     public PersonDTO createPerson(Person person) {
         logger.info("Creating one person!");
-        person.setId(UUID.randomUUID());
-        persons.add(person);
-        return new PersonDTO(person.getId(), person.getFirstName());
+        Person savedEntity = personRepository.save(person);
+        return new PersonDTO(savedEntity.getId(), savedEntity.getFirstName());
+
     }
-    
+
+    private Person findById(UUID id) {
+        return personRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
+    }
+
     public PersonDTO updatePerson(Person person) {
         logger.info("Editing one person!");
-        for (Person p : persons) {
-            if (p.getId().equals(person.getId())) {
-                if (person.getFirstName() != null) p.setFirstName(person.getFirstName());
-                if (person.getLastName() != null) p.setLastName(person.getLastName());
-                if (person.getAddress() != null) p.setAddress(person.getAddress());
-                if (person.getGender() != null) p.setGender(person.getGender());
-                return new PersonDTO(p.getId(), p.getFirstName());
-            }
-        }
-        return null;
+        Person entity = simplefiedFindById(person.getId());
+        entity.setFirstName(person.getFirstName());
+        entity.setLastName(person.getLastName());
+        entity.setAddress(person.getAddress());
+        entity.setGender(person.getGender());
+        personRepository.save(entity);
+        return new PersonDTO(entity.getId(), entity.getFirstName());
     }
 
     public void deletePerson(UUID id) {
         logger.info("Deleting one person!");
-        persons.removeIf(x -> x.getId().equals(id));
+        Person entity = simplefiedFindById(id);
+        personRepository.deleteById(entity.getId());
     }
 
-    private List<Person> mockPersons() {
-        Person person1 = new Person.Builder()
-                .withFirstName("George")
-                .withLastName("Matos")
-                .withAddress("Rua Oriente, 121, Piratininga")
-                .withGender("Male").build();
-        Person person2 = new Person.Builder()
-                .withFirstName("Thaiane")
-                .withLastName("Matos")
-                .withAddress("Rua Oriente, 121, Piratininga")
-                .withGender("Female").build();
-        Person person3 = new Person.Builder()
-                .withFirstName("Moana")
-                .withLastName("Matos")
-                .withAddress("Rua Oriente, 121, Piratininga")
-                .withGender("Dog").build();
-
-        return Arrays.asList(person1, person2, person3);
-    }
 }
