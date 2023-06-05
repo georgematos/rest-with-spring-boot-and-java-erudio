@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,8 @@ public class PersonController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePerson(@PathVariable String id) {
+    public ResponseEntity<?> deletePerson(@PathVariable String id) {
         personService.deletePerson(UUID.fromString(id));
+        return ResponseEntity.noContent().build();
     }
 }
